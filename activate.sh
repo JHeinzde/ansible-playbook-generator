@@ -1,1 +1,3 @@
-export PATH=$PATH:$(pwd)
+#!/usr/bin/env bash
+
+export PYTHONPATH=$PYTHONPATH:$(pwd)

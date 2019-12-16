@@ -1,6 +1,6 @@
 import os
 import yaml
-from detect_changed_roles import get_roles_from_playbook
+from src.detect_changed_roles import get_roles_from_playbook
 from typing import List, Dict
 
 
