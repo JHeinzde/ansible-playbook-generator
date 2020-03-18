@@ -29,7 +29,31 @@ def _detect_changed_vars_files(changed_files: List[str]) -> List[str]:
 
     return changed_var_files
 
+def detect_changed_config_files(changed_files: List[str]) -> List[str]:
+    changed_config_files = []
 
+    for file in changed_files:
+        if "configuration/" in file:
+            changed_config_files.append(file)
+    
+    return changed_config_files
+
+def detect_changed_service_roles_from_config_files(changed_config_files: List[str], roles: List[str]) -> List[str]:
+    changed_services = []
+    changed_service_roles = []
+    for changed_config_file in changed_config_files:
+        match = re.search("configuration/(.*?)/", changed_config_file)
+        if match:
+            service_name_without_prefix = match.group(1) #get the name of the service
+            service_name = "tos-" + service_name_without_prefix
+            changed_services.append(service_name)
+    
+    for changed_service in changed_services:
+        for role in roles:
+            if changed_service in role:
+                changed_service_roles.append(role)
+    return changed_service_roles
+    
 def _load_vars_files(changed_vars: List[str], playbook_abs_path: str) -> List[str]:
     var_names = []
     for file in changed_vars:
@@ -39,7 +63,6 @@ def _load_vars_files(changed_vars: List[str], playbook_abs_path: str) -> List[st
             var_names.append(key)
 
     return var_names
-
 
 def _compile_regexes(var_names: List[str]) -> List[re.Pattern]:
     patterns = set([])
