@@ -3,6 +3,7 @@ import yaml
 import glob
 import re
 from typing import List
+import dependency_resolver
 
 
 def _get_abs_path(playbook_abs_path: str, role_dir: str) -> str:
@@ -19,7 +20,7 @@ def _resolve_all_roles(playbook_abs_path: str, role_dir: str, roles: List[str]):
             _resolve_all_roles(playbook_abs_path, "/".join([role_dir, r_dir]), roles)
 
 
-def _detect_vars_files(changed_files: List[str]) -> List[str]:
+def _detect_changed_vars_files(changed_files: List[str]) -> List[str]:
     changed_var_files = []
 
     for file in changed_files:
@@ -32,7 +33,7 @@ def _detect_vars_files(changed_files: List[str]) -> List[str]:
 def _load_vars_files(changed_vars: List[str], playbook_abs_path: str) -> List[str]:
     var_names = []
     for file in changed_vars:
-        abs_path = "/".join([playbook_abs_path, file])
+        abs_path = "/".join([playbook_abs_path, file.replace("tos-install/", "")])
         l_file = yaml.safe_load(open(abs_path, 'r'))
         for key in l_file.keys():
             var_names.append(key)
@@ -101,10 +102,22 @@ def get_changed_roles(playbook_abs_path: str, changed_files: List[str]) -> List[
             if role in file and role not in changed_roles:
                 changed_roles.append(role)
 
+    component_roles, changed_roles = dependency_resolver.get_component_roles(changed_roles)
+    deps = dependency_resolver.get_all_dependencies(playbook_abs_path)
+    c_changed_roles = dependency_resolver.filter_roles_with_dependencies(component_roles, deps)
+
+    for changed_role in c_changed_roles:
+        changed_roles.append(changed_role)
+
     result_list = []
     for role in changed_roles:
         result_list.append(role.replace("roles/", ""))
 
-    vars_files = _detect_vars_files(changed_files)
+    vars_files = _detect_changed_vars_files(changed_files)
+    var_names = _load_vars_files(vars_files, playbook_abs_path)
+    v_changed = _detect_changed_roles_from_vnames(var_names, playbook_abs_path)
 
-    return result_list
+    for role in v_changed:
+        result_list.append(role.replace("roles/", ""))
+
+    return list(set(result_list))
