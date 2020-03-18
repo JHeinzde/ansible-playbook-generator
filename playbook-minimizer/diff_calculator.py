@@ -56,26 +56,67 @@ def _get_changed_files(repo: git.Repo, branch: str,  playbook_dir: str) -> List[
     return changed_files
 
 
-def get_changed_files_local(repo_dir: str, branch: str, playbook_dir: str) -> List[str]:
+def _get_changed_files_ci(repo: git.Repo, before_commit: str, after_commit: str, playbook_dir: str) -> List[str]:
+    """
+    This function calculates the changed files between two branches inside the provided playbook directory within a merge request in GitLab CI
+    :param repo: The repository, that the merge request is performed on
+    :param before_commit: The content of the CI_COMMIT_BEFORE_SHA
+    :param after_commit: The content of the CI_COMMIT_SHA
+    :param playbook_dir: The directory where the playbook and its roles/vars etc. are contained
+                         The diff calculation is only done for this directory and the path is relative to the repo root.
+    :return:
+    """
+
+    before = repo.commit(before_commit)
+    after = repo.commit(after_commit)
+
+    diffs = before.diff(after, playbook_dir)
+    changed_files = []
+    for diff in diffs:
+        if diff.renamed_file:
+            changed_files.append(diff.renamed_to)
+        else:
+            changed_files.append(diff.a_path)
+    return changed_files
+
+
+def get_changed_files_local(repo_dir: str, src_branch: str, target_branch: str, playbook_dir: str) -> List[str]:
     """
     This function calculates the changed files between to branches inside the provided playbook directory
     @param repo_dir The directory of the repository, that contains the provided branches
-    @param branch The branch you merged into
+    @param src_branch The source branch for the calculation(the branch you intend to merge)
+    @param target_branch The target branch for the diff calculation(the branch you intend to merge into)
     @param playbook_dir The directory where the playbook and its roles/vars etc. are contained.
                         The diff calculation is only done for this directory
     """
 
     repo = _get_local_repo(repo_dir)
-    return _get_changed_files(repo, branch, playbook_dir)
+    return _get_changed_files(repo, src_branch, target_branch, playbook_dir)
 
 
-def get_changed_files_remote(repo_url: str, branch: str, playbook_dir: str) -> List[str]:
+def get_changed_files_ci(repo_dir: str, before_commit: str, after_commit: str, playbook_dir: str) -> List[str]:
+    """
+    This function calculates the changed files between to branches inside the provided playbook directory, designed for usage in merge requests in CIs.
+    :param repo_dir: The directory of the repository, that contains the provided branches
+    :param before_commit: The content of the CI_COMMIT_BEFORE_SHA
+    :param after_commit: The content of the CI_COMMIT_SHA
+    :param playbook_dir: The directory where the playbook and its roles/vars etc. are contained
+                         The diff calculation is only done for this directory and the path is relative to the repo root.
+    :return:
+    """
+
+    repo = _get_local_repo(repo_dir)
+    return _get_changed_files_ci(repo, before_commit, after_commit, playbook_dir)
+
+
+def get_changed_files_remote(repo_url: str, src_branch: str, target_branch: str, playbook_dir: str) -> List[str]:
     """
     This function calculates the changed files between to branches inside the provided playbook directory
     @param repo_url The url of the repository, that contains the provided branches
-    @param branch The branch you merged into
+    @param src_branch The source branch for the calculation(the branch you intend to merge)
+    @param target_branch The target branch for the diff calculation(the branch you intend to merge into)
     @param playbook_dir The directory where the playbook and its roles/vars etc. are contained.
                         The diff calculation is only done for this directory
     """
     repo = _get_remote_repo(repo_url)
-    return _get_changed_files(repo, branch,  playbook_dir)
+    return _get_changed_files(repo, src_branch, target_branch, playbook_dir)
