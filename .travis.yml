@@ -9,4 +9,5 @@ deploy:
   file: playbook-minimizer-build
   on:
     repo: JHeinzde/ansible-playbook-generator
-    branch: heads/stash
+    branch: master
+    tags: true
