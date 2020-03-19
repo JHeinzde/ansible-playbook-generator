@@ -1,5 +1,12 @@
 language: python
 python:
-  - '3.8'
-
+- '3.8'
 script: ci/build.sh
+deploy:
+  provider: releases
+  api_key:
+    secure: KRcJerPQyaZSiP/3VYvss+qe08TVflHbryzjXPHZXL03Nvd3bSwLqmp3JPOuAtBLYBufrXuCbw62oP9HyqktZ1weibJiaBiRQ9rt9NGxtqN8my6+RGcbgbjl/yLObwjTRFgm1n7pa7NkoVpD/Pn9vUDxMrk/cvFPGfhbtAeWuECWbWjba2ta2QVp2pgRJdWPkmEWJ2gFOpJ2IKo52KLhSkr1+c1xcFXl/MH+XJ1+JFm6Uohvb3q4djTDEXDFeHjP+pDf5TtBsADaPtXp2V4VKdFDMyxGrdaVfikIZj6Wnfree0yeXxY1/NVxBpAf60ncMxpiz7slsk5OGNinEGSfjNZpjVLLkrfuXegQwH/WdRpHUU9hTIJS7m6UXYzKpjGnIZCiE9YYAhYCMJ5izUEXM++C0UTCstPthx7H7MAWCCI0EwiZrRTjiExCIuTspGq2o2jbq82qamMdKmWpZE4S4hRKBld/YGpfpz2xU7Jcr9DwyZgKRzDty1R7SskFTCILsOEJYsgOIi8fp36zwEB4N0oiC4klydp6shg3gthsueKTaaPoHFKUP7Lp7trZRzXNBHlNO2w3P2jZOgVmJEmxjrOagvUd9pAEFApqU+Egjp3XEP3TDmMBdvoUrgb+3bXZFpfb/ohIsSsNHt9pOeyJLVhkYFWvC9lO00rXEoxgZY0=
+  file: playbook-minimizer-build
+  on:
+    repo: JHeinzde/ansible-playbook-generator
+    branch: heads/stash
