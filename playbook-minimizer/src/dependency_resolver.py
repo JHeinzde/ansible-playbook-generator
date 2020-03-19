@@ -1,25 +1,41 @@
 import os
 import yaml
-from src.detect_changed_roles import get_roles_from_playbook
+import utils
 from typing import List, Dict
 
 
-def get_all_dependencies(playbook_dir: str) -> Dict[str, List[str]]:
+def get_all_dependencies(playbook_abs_path: str) -> Dict[str, List[str]]:
     """
     This function takes a playbook path and extracts all role dependencies
-    @param playbook_dir The path to the playbook (must be absolute!)
+    @param playbook_abs_path The path to the playbook (must be absolute!)
     @return A map with the role name as key and a list of its dependencies as value
     """
-    all_roles = get_roles_from_playbook(playbook_dir)
+    all_roles = utils.get_roles_from_playbook(playbook_abs_path)
     role_deps = {}
 
     for role in all_roles:
-        abs_path = "/".join([playbook_dir, role, "meta", "main.yml"])
+        abs_path = "/".join([playbook_abs_path, role, "meta", "main.yml"])
         if os.path.isfile(abs_path):
             deps = yaml.safe_load(open(abs_path, 'r'))
             role_deps[role] = deps
 
     return role_deps
+
+
+def get_component_roles(changed_roles: List[str]) -> (List[str], List[str]):
+    """
+    Takes a list of changed roles and returns all the component roles contained.
+    @param changed_roles All changed roles.
+    """
+    result = []
+    for role in changed_roles:
+        if 'component' in role:
+            result.append(role)
+
+    for role in result:
+        changed_roles.remove(role)
+
+    return result, changed_roles
 
 
 def filter_roles_with_dependencies(c_roles: List[str], all_deps: Dict[str, List[str]]) -> Dict[str, List[str]]:
