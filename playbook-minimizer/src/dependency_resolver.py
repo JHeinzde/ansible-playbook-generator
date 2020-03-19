@@ -1,6 +1,6 @@
 import os
 import yaml
-from detect_changed_roles import get_roles_from_playbook
+import utils
 from typing import List, Dict
 
 
@@ -10,7 +10,7 @@ def get_all_dependencies(playbook_abs_path: str) -> Dict[str, List[str]]:
     @param playbook_abs_path The path to the playbook (must be absolute!)
     @return A map with the role name as key and a list of its dependencies as value
     """
-    all_roles = get_roles_from_playbook(playbook_abs_path)
+    all_roles = utils.get_roles_from_playbook(playbook_abs_path)
     role_deps = {}
 
     for role in all_roles:
