@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd ../playbook-minimizer/src
+cd ./playbook-minimizer/src
 zip -r playbook-minimizer.zip ./*
 cp playbook-minimizer.zip ../../
 cd ../
