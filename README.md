@@ -15,7 +15,7 @@ to calculate the changed roles. A sample call for this would be
 ```bash
 ./playbook-minimizer --force_roles_config_path=<path-to-a-file-including-roles-to-force-include> <directory-of-the-git-repo-that-contains-the-playbook> <playbook-name> <out_path-and-name-of-new-playbook>
 ```
-The last argument is a path to a YAML config! It is a simple file with this structur
+The last argument is a path to a YAML config! It is a simple file with this structure
 ````yaml
 - role1
 - role2
