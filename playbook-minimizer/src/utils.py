@@ -23,9 +23,23 @@ def get_roles_from_playbook(playbook_abs_path: str) -> List[str]:
     @return A list containing all roles inside the roles directory in the playbook
     """
     role_dir = list(filter(lambda x: 'roles' in x, os.listdir(playbook_abs_path)))
-    role_dir = role_dir[0]  # only take this first directory that matches my criteria
+    role_dir = role_dir[0]  # only take the first directory that matches my criteria
 
     roles = []
     resolve_all_roles(playbook_abs_path, role_dir, roles)
 
     return roles
+
+
+class File:
+    def __init__(self, file_name):
+        self.file = open(file_name, 'r+')
+
+    def __del__(self):
+        self.file.close()
+
+    def get_file_content(self):
+        return self.file.read()
+
+    def write_to_file(self, content):
+        self.file.write(content)

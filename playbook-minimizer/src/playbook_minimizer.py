@@ -1,23 +1,30 @@
 import yaml
+import utils
 
 
-def minify_playbook(changed_roles, playbook_file, output_path):
-    """
-    This function takes the changed_roles and a playbook file and filters
-    all roles that are not changed out of it. Then it prints it to the specified path
-    @param changed_roles A list of changed roles in this merge request
-    @param playbook_file The path to the playbook that should be minified
-    @param output_path The path where the minified playbook should be written too
-    """
+class PlaybookMinimizer:
 
-    playbook = yaml.safe_load(open(playbook_file, 'r'))
-    counter = 0
-    for host in playbook:
-        new_roles = []
-        for role in host['roles']:
-            if role['role'] in changed_roles:
-                new_roles.append(role)
-        playbook[counter]['roles'] = new_roles
-        counter += counter
+    def __init__(self, changed_roles, playbook_file, output_path):
+        self.changed_roles = changed_roles
+        self.playbook_file = utils.File(playbook_file)
+        self.output_file = utils.File(output_path)
 
-    yaml.safe_dump(playbook, open(output_path, 'w'))
+    def minify_playbook(self):
+        """
+        This function takes the changed_roles and a playbook file and filters
+        all roles that are not changed out of it. Then it prints it to the specified path
+        """
+
+        file_content = self.playbook_file.get_file_content()
+        playbook = yaml.safe_load(file_content)
+
+        counter = 0
+        for host in playbook:
+            new_roles = []
+            for role in host['roles']:
+                if role['role'] in self.changed_roles:
+                    new_roles.append(role)
+            playbook[counter]['roles'] = new_roles
+            counter += counter
+
+        self.output_file.write_to_file(yaml.safe_dump(playbook))
