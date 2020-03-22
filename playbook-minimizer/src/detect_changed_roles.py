@@ -1,9 +1,11 @@
-import dependency_resolver
 import glob
 import re
-import utils
-import yaml
 from typing import List
+
+import yaml
+
+import dependency_resolver
+import utils
 
 
 def _detect_changed_vars_files(changed_files: List[str]) -> List[str]:
@@ -107,9 +109,9 @@ def get_changed_roles(playbook_abs_path: str, changed_files: List[str]) -> List[
         if changed_service_role not in changed_roles:
             changed_roles.append(changed_service_role)
 
-    component_roles, changed_roles = dependency_resolver.get_component_roles(changed_roles)
-    deps = dependency_resolver.get_all_dependencies(playbook_abs_path)
-    c_changed_roles = dependency_resolver.filter_roles_with_dependencies(component_roles, deps)
+    component_roles, changed_roles = utils.get_component_roles(changed_roles)
+    deps = dependency_resolver.DependencyResolver(playbook_abs_path).get_all_dependencies()
+    c_changed_roles = utils.filter_roles_with_dependencies(component_roles, deps)
 
     for changed_role in c_changed_roles:
         changed_roles.append(changed_role)

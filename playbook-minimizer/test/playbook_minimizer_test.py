@@ -19,5 +19,5 @@ class PlaybookMinimizerTest(unittest.TestCase):
             [{'roles': [{'role': 'abc'}, {'role': "efg"}, {'role': "hij"}]}])
         mockito.when(yaml).safe_dump(mockito.ANY).thenReturn('')
 
-        obj_under_test.minify_playbook()
+        obj_under_test.minify_playbook([])
         mockito.verify(yaml).safe_dump([{'roles': [{'role': 'abc'}, {'role': 'hij'}]}])

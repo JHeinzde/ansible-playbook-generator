@@ -9,7 +9,7 @@ class PlaybookMinimizer:
         self.playbook_file = utils.File(playbook_file)
         self.output_file = utils.File(output_path)
 
-    def minify_playbook(self):
+    def minify_playbook(self, roles_to_always_include):
         """
         This function takes the changed_roles and a playbook file and filters
         all roles that are not changed out of it. Then it prints it to the specified path
@@ -22,7 +22,7 @@ class PlaybookMinimizer:
         for host in playbook:
             new_roles = []
             for role in host['roles']:
-                if role['role'] in self.changed_roles:
+                if role['role'] in self.changed_roles or role['role'] in roles_to_always_include:
                     new_roles.append(role)
             playbook[counter]['roles'] = new_roles
             counter += counter
