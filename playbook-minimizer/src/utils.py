@@ -46,6 +46,7 @@ def get_component_roles(changed_roles: List[str]) -> (List[str], List[str]):
 
     return result, changed_roles
 
+
 def filter_roles_with_dependencies(c_roles: List[str], all_deps: Dict[str, List[str]]) -> Dict[str, List[str]]:
     """
     If there are changes in roles that are never used directly by a playbook, but only other roles,
@@ -67,10 +68,10 @@ def filter_roles_with_dependencies(c_roles: List[str], all_deps: Dict[str, List[
 
 class File:
     def __init__(self, file_name):
-        self.file = open(file_name, 'r+')
-
-    def __del__(self):
-        self.file.close()
+        if os.path.exists(file_name):
+            self.file = open(file_name, 'r+')
+        else:
+            self.file = open(file_name, 'w+')
 
     def get_file_content(self):
         return self.file.read()

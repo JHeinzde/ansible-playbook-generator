@@ -56,7 +56,7 @@ def _load_vars_files(changed_vars: List[str], playbook_abs_path: str) -> List[st
     return var_names
 
 
-def _compile_regexes(var_names: List[str]) -> List[re.Pattern]:
+def _compile_regexes(var_names: List[str]):
     patterns = set([])
     for var in var_names:
         patterns.add(re.compile(r".*{{.*" + var + r".*}}.*", re.DOTALL))
