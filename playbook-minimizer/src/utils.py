@@ -57,12 +57,12 @@ def filter_roles_with_dependencies(c_roles: List[str], all_deps: Dict[str, List[
     dependent_roles = {}
 
     for c_role in c_roles:
-        for role, deps in all_deps:
+        for role, deps in all_deps.items():
             for dep in deps:
                 if dep["role"] in c_role:
                     dependent_roles.setdefault(c_role, [])
-                    dependent_roles[c_role].append(dep["role"])
-
+                    dependent_roles[c_role].append(role)
+    print(dependent_roles)
     return dependent_roles
 
 

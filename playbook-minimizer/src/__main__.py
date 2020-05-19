@@ -21,6 +21,7 @@ def main():
     repo_path = os.environ['CI_PROJECT_DIR']
     before_sha = os.environ['CI_COMMIT_BEFORE_SHA']
     after_sha = os.environ['CI_COMMIT_SHA']
+    environment_name = os.environ['CI_ENVIRONMENT_NAME']
 
     if args.force_roles_config_path is not None:
         with open(args.force_roles_config_path) as f:
@@ -32,7 +33,7 @@ def main():
         .GitLabCIDiffer(repo_path, before_sha, after_sha, args.playbook_dir) \
         .get_changed_files()
 
-    changed_roles = detect_changed_roles.get_changed_roles("/".join([repo_path, args.playbook_dir]), diff)
+    changed_roles = detect_changed_roles.get_changed_roles("/".join([repo_path, args.playbook_dir]), diff, environment_name)
     minimizer = playbook_minimizer.PlaybookMinimizer(changed_roles, "/".join(
         [repo_path, args.playbook_dir, args.playbook_name]),
                                                      args.playbook_out_path)
