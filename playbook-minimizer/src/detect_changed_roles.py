@@ -8,11 +8,11 @@ import dependency_resolver
 import utils
 
 
-def _detect_changed_vars_files(changed_files: List[str]) -> List[str]:
+def _detect_changed_vars_files(changed_files: List[str], environment_name: str) -> List[str]:
     changed_var_files = []
 
     for file in changed_files:
-        if "vars" in file:
+        if "vars" in file and environment_name in file:
             changed_var_files.append(file)
 
     return changed_var_files
@@ -87,12 +87,13 @@ def _detect_changed_roles_from_vnames(var_names: List[str], playbook_abs_path: s
     return list(set(changed_roles))
 
 
-def get_changed_roles(playbook_abs_path: str, changed_files: List[str]) -> List[str]:
+def get_changed_roles(playbook_abs_path: str, changed_files: List[str], environment_name: str) -> List[str]:
     """
     This function takes an absolute path to a playbook and a list of changed_files in the repository of the playbook.
     Using these parameter the function calculates the changed roles inside the playbook.
     @param playbook_abs_path The absolute path to the playbook
     @param changed_files A list of changed files from the playbook repo
+    @param environment_name The name of the environment for which the playbook is built
     """
     roles = utils.get_roles_from_playbook(playbook_abs_path)
     changed_roles = []
@@ -113,14 +114,15 @@ def get_changed_roles(playbook_abs_path: str, changed_files: List[str]) -> List[
     deps = dependency_resolver.DependencyResolver(playbook_abs_path).get_all_dependencies()
     c_changed_roles = utils.filter_roles_with_dependencies(component_roles, deps)
 
-    for changed_role in c_changed_roles:
-        changed_roles.append(changed_role)
+    for changed_role in c_changed_roles.values():
+        for element in changed_role:
+            changed_roles.append(element)
 
     result_list = []
     for role in changed_roles:
         result_list.append(role.replace("roles/", ""))
 
-    vars_files = _detect_changed_vars_files(changed_files)
+    vars_files = _detect_changed_vars_files(changed_files, environment_name)
     var_names = _load_vars_files(vars_files, playbook_abs_path)
     v_changed = _detect_changed_roles_from_vnames(var_names, playbook_abs_path)
 

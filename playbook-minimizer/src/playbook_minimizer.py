@@ -21,11 +21,10 @@ class PlaybookMinimizer:
         counter = 0
         for host in playbook:
             new_roles = []
-            if host['roles']:
-                for role in host['roles']:
-                    if role['role'] in self.changed_roles or role['role'] in roles_to_always_include:
-                        new_roles.append(role)
-                playbook[counter]['roles'] = new_roles
+            for role in host['roles']:
+                if role['role'] in self.changed_roles or role['role'] in roles_to_always_include:
+                    new_roles.append(role)
+            playbook[counter]['roles'] = new_roles
             counter += 1
 
         self.output_file.write_to_file(yaml.safe_dump(playbook))

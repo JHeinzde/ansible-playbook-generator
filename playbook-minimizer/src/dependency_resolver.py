@@ -6,7 +6,7 @@ import yaml
 import utils
 
 
-class DependencyResolver():
+class DependencyResolver:
 
     def __init__(self, playbook_abs_path):
         self.playbook_abs_path = playbook_abs_path
@@ -14,7 +14,6 @@ class DependencyResolver():
     def get_all_dependencies(self) -> Dict[str, List[str]]:
         """
         This function takes a playbook path and extracts all role dependencies
-        @param playbook_abs_path The path to the playbook (must be absolute!)
         @return A map with the role name as key and a list of its dependencies as value
         """
         all_roles = utils.get_roles_from_playbook(self.playbook_abs_path)
@@ -24,6 +23,9 @@ class DependencyResolver():
             abs_path = utils.get_abs_path(self.playbook_abs_path, role, "meta", "main.yml")
             if os.path.isfile(abs_path):
                 deps = yaml.safe_load(open(abs_path, 'r'))
-                role_deps[role] = deps
+                if 'dependencies' in deps.keys():
+                    role_deps[role] = deps['dependencies']
+                else:
+                    role_deps[role] = []
 
         return role_deps
