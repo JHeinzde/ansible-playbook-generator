@@ -22,7 +22,7 @@ def get_roles_from_playbook(playbook_abs_path: str) -> List[str]:
     @param playbook_abs_path The absolute path to the playbook
     @return A list containing all roles inside the roles directory in the playbook
     """
-    role_dir = list(filter(lambda x: 'roles' in x, os.listdir(playbook_abs_path)))
+    role_dir = list(filter(lambda x: 'roles' in x and '.yml' not in x, os.listdir(playbook_abs_path)))
     role_dir = role_dir[0]  # only take the first directory that matches my criteria
 
     roles = []
